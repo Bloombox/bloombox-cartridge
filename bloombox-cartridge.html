@@ -40,7 +40,7 @@
     </style>
 
     <template is="dom-if" if="[[!zerostate]]">
-      <paper-card heading="[[name]]" class="product-card cartridge-product data-content fullwidth">
+      <paper-card heading="[[_renderBrand()]][[name]]" class="product-card cartridge-product data-content fullwidth">
         <div class="card-content">
           <!-- Description -->
           <div class="row description-container">

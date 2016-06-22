@@ -12,18 +12,61 @@
     <link rel="import" href="../bloombox-cartridge.html">
 
     <style is="custom-style" include="demo-pages-shared-styles">
+      .vertical-section-container.centered {
+        max-width: 700px !important;
+      }
     </style>
   </head>
   <body>
-
     <div class="vertical-section-container centered">
-      <h3>Basic bloombox-cartridge Demo</h3>
+      <h3>Zerostate Example</h3>
       <demo-snippet>
         <template>
-          <bloombox-cartridge></bloombox-cartridge>
+          <bloombox-cartridge zerostate></bloombox-cartridge>
         </template>
       </demo-snippet>
     </div>
 
+    <div class="vertical-section-container centered">
+      <h3>Data Example (normal display mode)</h3>
+      <demo-snippet>
+        <template>
+          <bloombox-cartridge
+            key="sample1"
+            display-mode="normal"
+            name="Extra-strength CBD Capsule"
+            photos='["test.jpg"]'
+            description="This awesome capsule fixes everything in your body instantly"
+            tests='{"cbd":60,"thc":15}'
+            pricing='{"unit": {"available": true, "value": 5}}'
+            sale="20"
+            bogo="true"
+            visible="true"
+            premium="true"
+            partner="mm"></bloombox-cartridge>
+        </template>
+      </demo-snippet>
+    </div>
+
+    <div class="vertical-section-container centered">
+      <h3>Data Example (slim display mode)</h3>
+      <demo-snippet>
+        <template>
+          <bloombox-cartridge
+            key="sample1"
+            display-mode="slim"
+            name="Extra-strength CBD Capsule"
+            photos='["test.jpg"]'
+            description="This awesome capsule fixes everything in your body instantly"
+            tests='{"cbd":60,"thc":15}'
+            pricing='{"unit": {"available": true, "value": 5}}'
+            sale="20"
+            bogo="true"
+            visible="true"
+            premium="true"
+            partner="mm"></bloombox-cartridge>
+        </template>
+      </demo-snippet>
+    </div>
   </body>
 </html>

@@ -10,26 +10,642 @@
 
 <link rel="import" href="../polymer/polymer.html">
 
+<link rel="import" href="../iron-icon/iron-icon.html">
+<link rel="import" href="../iron-icons/iron-icons.html">
+<link rel="import" href="../iron-label/iron-label.html">
+
+<link rel="import" href="../paper-card/paper-card.html">
+<link rel="import" href="../paper-item/paper-item.html">
+<link rel="import" href="../paper-input/paper-input.html">
+<link rel="import" href="../paper-input/paper-textarea.html">
+<link rel="import" href="../paper-button/paper-button.html">
+<link rel="import" href="../paper-slider/paper-slider.html">
+<link rel="import" href="../paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../paper-dropdown-menu/paper-dropdown-menu.html">
+
+<link rel="import" href="../bloombox-media/bloombox-media.html">
+<link rel="import" href="../bloombox-styles/bloombox-styles.html">
+<link rel="import" href="../bloombox-testing/bloombox-testing.html">
+<link rel="import" href="../bloombox-pricelist/bloombox-price.html">
+
+
 <dom-module id="bloombox-cartridge">
   <template>
-    <style>
+    <style is="custom-style" include="bloombox-styles">
       :host {
         display: block;
       }
     </style>
-    <b>CARTRIDGE</b>
+
+    <template is="dom-if" if="[[!zerostate]]">
+      <paper-card heading="[[name]]" class="product-card cartridge-product data-content fullwidth">
+        <div class="card-content">
+          <!-- Description -->
+          <div class="row description-container">
+            <template is="dom-if" if="[[!_slim]]">
+              <template is="dom-if" if="[[description]]">
+                <div class="product-description">[[description]]</div>
+              </template>
+              <template is="dom-if" if="[[!description]]">
+                <div class="no-description">(No description)</div>
+              </template>
+            </template>
+          </div><!-- end div.row.description-container -->
+
+          <!-- Stock Flags -->
+          <div class="stock-flags cartridge-info test-info row">
+            <!-- MPMH -->
+            <iron-label class="premium-label" hidden$="[[!premium]]"><span>[[_renderPremiumLabel(partner)]]</span></iron-label>
+
+            <!-- Sale -->
+            <iron-label class="sale-label" hidden$="[[!sale]]"><span>[[sale]]% OFF</span></iron-label>
+
+            <!-- Buy-One-Get-One -->
+            <iron-label class="bogo-label" hidden$="[[!bogo]]"><span>Buy One Get One</span></iron-label>
+
+            <!-- Test Results -->
+            <bloombox-testing
+              mode="basic"
+              thc="[[tests.thc]]"
+              cbd="[[tests.cbd]]"></bloombox-testing>
+          </div><!-- end div.row.stock-flags -->
+
+          <!-- Product Media -->
+          <div class="product-media cartridge-media row">
+            <div class="bloombox-media-wrap">
+              <bloombox-media hidden$="[[_shouldHideImage()]]" disabled partner="[[partner]]" asset="[[_image]]"></bloombox-media>
+            </div><!-- end div.bloombox-media-wrap -->
+          </div><!-- end .row.cartridge-media -->
+
+          <!-- Price List -->
+          <div class="row pricelist">
+            <bloombox-price
+              class="cartridgeSealedPrice"
+              price="[[pricing.unit.value]]"
+              available="[[pricing.unit.available]]"
+              currency="$"></bloombox-price>
+          </div><!-- end div.row.pricelist -->
+          <template is="dom-if" if="[[!visible]]">
+            <div class="not-in-stock-overlay not-in-stock"></div><!-- end div.not-in-stock-overlay -->
+          </template>
+        </div><!-- end div.card-content -->
+        <div class="card-actions">
+          <paper-button on-tap="edit"><iron-icon icon="create"></iron-icon>Edit</paper-button>
+          <paper-button on-tap="delete"><iron-icon icon="delete"></iron-icon>Delete</paper-button>
+        </div>
+      </paper-card><!-- end paper-card.product-card.data-content.cartridge-product -->
+    </template>
+
+    <template is="dom-if" if="[[zerostate]]">
+      <paper-card header="Cartridge" class="product-card cartridge-product zerostate fullwidth">
+        <div class="card-content">
+          <div class="basic-info row">
+            <!-- Name & Description -->
+            <paper-input id="brandField" placeholder="Brand Name" value="{{brand}}" required no-label-float name="brand" class="form-item cartridge-brand"></paper-input>
+            <paper-input id="nameField" placeholder="Product Name" value="{{name}}" required no-label-float name="name" class="form-item cartridge-name"></paper-input>
+            <paper-textarea id="descriptionField" label="Description" value="{{description}}" no-label-float name="description" class="form-item cartridge-description"></paper-textarea>
+            <paper-dropdown-menu id="speciesField" label="Species" class="form-item" noink no-label-float required name="species">
+              <paper-listbox class="dropdown-content" selected="{{species}}">
+                <paper-item>Indica</paper-item>
+                <paper-item>Hybrid (Indica Dominant)</paper-item>
+                <paper-item>Hybrid (No Dominance)</paper-item>
+                <paper-item>Sativa</paper-item>
+              </paper-listbox>
+            </paper-dropdown-menu><!-- end paper-dropdown-menu#typeField -->
+          </div><!-- end .row.basic-info -->
+
+          <!-- Pricing/Sale Flags -->
+          <div class="stock-flags row">
+            <div class="row-label">
+              <span class="row-label-value">Inventory</span>
+            </div><!-- end div.row-label -->
+
+            <div class="in-stock-toggle-option">
+              <paper-checkbox id="showToggle" checked="{{visible}}" class="form-item show-item-toggle" noink>In Stock</paper-checkbox>
+            </div><!-- end .in-stock-toggle-option -->
+
+            <div class="premium-toggle-option">
+              <paper-checkbox id="premiumToggle" checked="{{premium}}" class="form-item premium-toggle" noink>[[_renderPremiumLabel(partner)]]</paper-checkbox>
+            </div><!-- end .premium-toggle-option -->
+
+            <div class="sale-toggle-option">
+              <div class="sale-toggle-container">
+                <paper-checkbox id="saleToggle" checked="[[_isOnSale()]]" on-tap="_toggleSale" class="form-item sale-toggle" noink>On Sale</paper-checkbox>
+              </div><!-- end .sale-toggle-container -->
+              <template is="dom-if" if="{{sale}}">
+                <div class="sale-amount-container">
+                  <paper-slider id="saleValue" pin value="{{sale}}" max="95" min="5" editable step="5" class="form-item"></paper-slider>
+                </div><!-- end .sale-amount-container -->
+                <div class="sale-percentage-label">% off</div>
+              </template>
+            </div><!-- end .sale-toggle-option -->
+
+            <div class="bogo-toggle-option">
+              <paper-checkbox id="bogoToggle" checked="{{bogo}}" class="form-item item-bogo-toggle" noink>Buy One, Get One</paper-checkbox>
+            </div><!-- end .bogo-toggle-option -->
+          </div><!-- end .row.stock-flags -->
+
+          <!-- Test Results -->
+          <div class="test-results row">
+            <div class="row-label">
+              <span class="row-label-value">Testing</span>
+            </div><!-- end div.row-label -->
+
+            <paper-checkbox id="testsToggle" checked="[[_hasKnownTestResults()]]" on-tap="_toggleTests" class="form-item tests-toggle" noink>Test Results</paper-checkbox>
+            <div class="test-results-container">
+              <template is="dom-if" if="{{tests}}">
+                <bloombox-testing
+                  id="productTesting"
+                  zerostate
+                  mode="basic"
+                  thc="{{tests.thc}}"
+                  cbd="{{tests.cbd}}"></bloombox-testing>
+              </template>
+            </div><!-- end .test-results-container -->
+          </div><!-- end .row.test-results -->
+
+          <!-- Price List -->
+          <div class="row pricelist">
+            <bloombox-price
+              id="editablePrice"
+              editable
+              price="{{pricing.unit.value}}"
+              available="{{pricing.unit.available}}"
+              currency="$"></bloombox-price>
+          </div><!-- end div.row.pricelist -->
+        </div><!-- end div.card-content -->
+
+        <!-- Actions -->
+        <template is="dom-if" if="[[editing]]">
+          <div class="cartridge-zerostate-actions card-actions row">
+            <paper-button id="saveButton" raised on-tap="commitEdits"><iron-icon icon="save"></iron-icon>Save</paper-button>
+            <paper-button id="cancelButton" on-tap="cancelEdits"><iron-icon icon="cancel"></iron-icon>Cancel</paper-button>
+          </div><!-- end .cartridge-zerostate-actions.card-actions -->
+        </template>
+        <template is="dom-if" if="[[!editing]]">
+          <div class="cartridge-zerostate-actions edit-actions card-actions row">
+            <paper-button id="submitButton" raised on-tap="persist"><iron-icon icon="check-circle"></iron-icon>Create</paper-button>
+            <paper-button id="discardButton" on-tap="_triggerDiscard"><iron-icon icon="cancel"></iron-icon>Discard</paper-button>
+          </div><!-- end .cartridge-zerostate-actions.card-actions.edit-actions -->
+        </template>        
+      </paper-card><!-- end paper-card.product-card.zerostate.cartridge-product -->
+    </template>
   </template>
 
   <script>
     Polymer({
-
       is: 'bloombox-cartridge',
 
       properties: {
-        prop1: {
+        /**
+         * Computes the current image/asset value, depending on how many `photos` are specified.
+         */
+        _image: {
           type: String,
-          value: 'bloombox-cartridge',
+          notify: true,
+          computed: '_computeImage(photos)'
+        },
+
+        /**
+         * Computes whether we are operating in `slim` display mode.
+         */
+        _slim: {
+          type: Boolean,
+          notify: true,
+          computed: '_computeSlimMode(displayMode)'
+        },
+
+        /**
+         * Display mode for the widget. Supported modes are `normal` and `slim`:
+         * - `normal`: Displays all available/specified widget data
+         * - `slim`: Omits description and product image
+         */
+        displayMode: {
+          type: String,
+          value: 'normal',
+          notify: true,
+          reflectToAttribute: true
+        },
+
+        /**
+         * Flag indicating that we are in a mode that demands a form to edit the data backing
+         * this widget. Combined with `editing`, this means we are either creating
+         * (`editing=false`) or editing an existing item.
+         */
+        zerostate: {
+          type: Boolean,
+          value: false,
+          notify: true,
+          reflectToAttribute: true
+        },
+
+        /**
+         * Flag indicating that we are in a mode where we are editing an existing item, not
+         * creating a new one.
+         */
+        editing: {
+          type: Boolean,
+          value: false,
+          notify: true,
+          reflectToAttribute: true
+        },
+
+        /**
+         * Object key for the current item. Provided by underlying persistence and unavailable
+         * until a new entry is stored.
+         */
+        key: {
+          type: String,
+          notify: true,
+          reflectToAttribute: true
+        },
+
+        /**
+         * String name of the brand that produces and/or distributes this product. Usually a
+         * simple string such as `"Kiva"` or `"Absolute Extracts"`.
+         */
+        brand: {
+          type: String,
+          notify: true,
+          reflectToAttribute: true
+        },
+
+        /**
+         * String value of the `species` of this current item, if known. Valid options:
+         * - `Indica`
+         * - `Hybrid (Indica Dominant)`
+         * - `Hybrid (No Dominance)`
+         * - `Hybrid (Sativa Dominant)`
+         * - `Sativa`
+         */
+        species: {
+          type: String,
+          notify: true,
+          reflectToAttribute: true
+        },
+
+        /**
+         * String name of the current product itself. Usually a simple string such as
+         * "Milk Chocolate Bar" or "High-strength CBD Cartridge".
+         */
+        name: {
+          type: String,
+          notify: true,
+          reflectToAttribute: true
+        },
+
+        /**
+         * Extended description for this product. Optional, hidden from the UI if not specified
+         * by the menu administrator.
+         */
+        description: {
+          type: String,
+          notify: true,
+          reflectToAttribute: true
+        },
+
+        /**
+         * Array of images attached to this product as media, if any. Provides an empty array
+         * by default to facilitate blind `.push()`.
+         */
+        photos: {
+          type: Array,
+          notify: true,
+          reflectToAttribute: true,
+          value: function() {
+            return [];
+          }
+        },
+
+        /**
+         * Object specifying QA test results for this product. This is expressable in two major
+         * forms, `rich` and `basic` (refer to the `<bloombox-testing>` documentation for more).
+         *
+         * Each product is coded to one or the other test result structure. In the case of
+         * `<bloombox-cartridge>`, only `basic` testing (`cbd` and `thc` values) is supported.
+         */
+        tests: {
+          type: Object,
+          notify: true,
+          reflectToAttribute: true
+        },
+
+        /**
+         * Object specifying product pricing. This is specified in either weighted pricing (i.e.
+         * pricing per-gram or per-ounce), which is generally used for raw product, namely
+         * flowers and concentrates.
+         *
+         * `<bloombox-cartridge>` uses per-unit pricing.
+         */
+        pricing: {
+          type: Object,
+          notify: true,
+          reflectToAttribute: true,
+          value: function() {
+            return {"unit": {"available": true, "value": 0}};
+          }
+        },
+
+        /**
+         * Value specifying the amount that this product is currently on-sale, if any. No value
+         * or a value of `0` is interpreted to mean "not on sale."
+         */
+        sale: {
+          type: Number,
+          notify: true,
+          reflectToAttribute: true
+        },
+
+        /**
+         * Flag value indicating that this item is on sale, such that buying one will get you
+         * an additional item for free ("Buy One Get One").
+         */
+        bogo: {
+          type: Boolean,
+          notify: true,
+          reflectToAttribute: true,
+          value: false
+        },
+
+        /**
+         * Boolean flag indicating whether this item is currently visible on the menu.
+         */
+        visible: {
+          type: Boolean,
+          notify: true,
+          reflectToAttribute: true,
+          value: true
+        },
+
+        /**
+         * Boolean flag indicating whether this item should be flagged as "Top Shelf"/"MPMH"
+         * or not.
+         */
+        premium: {
+          type: Boolean,
+          notify: true,
+          reflectToAttribute: true
+        },
+
+        /**
+         * Specifies the currently-active partner, to facilitate the generation of asset/media
+         * URLs and upload files to the right place.
+         */
+        partner: {
+          type: String,
+          notify: true,
+          value: "mm"
         }
+      },
+
+      /**
+       * Computation function for property `_image`, which plucks the active photo from `photos`,
+       * if any/applicable. Return value is a string asset reference to a photo in storage.
+       */
+      _computeImage: function(photos) {
+        if (Array.isArray(photos) && photos.length > 0)
+          return photos[0];
+        return null;
+      },
+
+      /**
+       * Computation function that returns whether we are currently in `slim` display mode.
+       */
+      _computeSlimMode: function(displayMode) {
+          return displayMode == "slim";
+      },
+
+      /**
+       * Render function that decides whether we should hide our `<bloombox-media>` element.
+       * We usually decide to hide it when:
+       * - The component is being viewed in `slim` mode
+       * - There is no image and we are not in `zerostate` mode
+       */
+      _shouldHideImage: function() {
+        // we should hide the image if:
+        // 1) we are in slimline mode
+        // 2) there is no image and we are in zero-state
+        var image = this.get("_image"),
+            slim = this.get("_slim");
+        return (slim || !image);
+      },
+
+      /**
+       * Render function that returns the label text that should be used for "Top Shelf".
+       * For everyone but Abatin Wellness, this is "Top Shelf." For them, it is "MPMH,"
+       * which stands for *Minimally Processed, Minimally Handled*.
+       */
+      _renderPremiumLabel: function(partner) {
+        if (partner === "abatin")
+          return "MPMH";
+        return "Top Shelf";
+      },
+
+      /**
+       * Render function that indicates whether the current item is on sale.
+       */
+      _isOnSale: function() {
+        return this.sale !== undefined && this.sale > 0;
+      },
+
+      /**
+       * Render function and UI responder that enables selection of a sale value via a
+       * slider UI.
+       */
+      _toggleSale: function() {
+        this.sale = this.$$("#saleToggle").checked ?
+            20 : undefined;
+      },
+
+      /**
+       * Render function and UI responder that enables input of product QA testing
+       * results.
+       */
+      _toggleTests: function() {
+        this.tests = this.$$("#testsToggle").checked ?
+            {} : undefined;
+      },
+
+      /**
+       * Render function that indicates whether the current item has QA test results
+       * available.
+       */
+      _hasKnownTestResults: function() {
+        return this.tests !== undefined && this.tests !== null && typeof this.tests == "object";
+      },
+
+      /**
+       * Discard the current `zerostate`/uncommitted new item.
+       */
+      _triggerDiscard: function() {
+        bloom.app.toggleAddEntry();
+      },
+
+      /**
+       * Commit current edits to this object. Used from `zerostate` mode to persist
+       * changes upwards to the active application.
+       */
+      commitEdits: function(callback) {
+        var previous = this.readObjectData(),
+            serialized = this.readZeroStateForm()
+            that = this;
+        console.log("Committing edits...", previous, serialized);
+        bloom.app.saveEditsForEntry("cartridges", this.get("key"), previous, serialized, function (error) {
+          // handle edit success/fail
+          if (error) {
+            console.error("Failed to save edits for item: ", this, error);
+            alert('Failed to apply edits.');
+          } else {
+            console.log("Edits applied successfully.");
+            if (callback !== undefined && typeof callback === "function")
+              callback();
+            that.set("editing", false);
+            that.set("zerostate", false);
+          }
+        });
+      },
+
+      /** 
+       * Cancel staged edits and revert out of editing UI.
+       */
+      cancelEdits: function() {
+        console.log("Cancelled staged edits for item.");
+        this.set("editing", false);
+        this.set("zerostate", false);
+      },
+
+      /**
+       * Save the current `zerostate` dataset as a new entry in underlying persistence.
+       */
+      persist: function() {
+          bloom.app.saveNewObject("cartridges", this.readZeroStateForm());  // read the form into our object
+      },
+
+      /**
+       * Delete the current item from underlying persistence.
+       */
+      delete: function() {
+        console.log("Deleting item...", this);
+        bloom.app.deleteEntryAtId("cartridges", this.get("key"));
+      },
+
+      /**
+       * Edit the current item (switch to `zerostate` mode).
+       */
+      edit: function() {
+        console.log("Editing item...", this);
+        this.set("editing", true);
+        this.set("zerostate", true);
+      },
+
+      /**
+       * Read underlying object data, suitable for writing into underlying persistence
+       * or comparing with edits.
+       */
+      readObjectData: function() {
+        var payload = {};
+
+        // handle required fields
+        payload.name = this.get("name");
+        payload.brand = this.get("brand");
+        payload.type = this.get("type");
+        payload.photos = this.get("photos") || [];
+        payload.pricing = this.get("pricing");
+
+        // handle test results
+        if (this.get("tests") !== undefined && this.get("tests") != null) {
+          payload.tests = {
+            thc: this.get("tests").thc,
+            cbd: this.get("tests").cbd
+          };
+        }
+
+        // handle optional fields
+        if (this.get("premium") == true) {
+          payload.flags = payload.flags || {};
+          payload.flags.premium = true;
+        }
+        if (this.get("sale") !== undefined && this.get("sale") != null) {
+          payload.flags = payload.flags || {};
+          payload.flags.sale = this.get("sale");
+        }
+        if (this.get("visible") != null && this.get("visible") != undefined) {
+          payload.flags = payload.flags || {};
+          payload.flags.visible = this.get("visible");
+        }
+        if (this.get("bogo") != null && this.get("bogo") != undefined) {
+          payload.flags = payload.flags || {};
+          payload.flags.bogo = this.get("bogo");
+        }
+        if (this.get("description") !== undefined && this.get("description") !== null &&
+            this.get("description").length > 0) payload.description = this.get("description");
+        return payload;
+      },
+
+      /**
+       * Read underlying object data direct from the current zero-state form.
+       */
+      readZeroStateForm: function() {
+        var payload = {},
+            priceValue = this.$$("#editablePrice").value,
+            priceAvailable = this.$$("#editablePrice").available,
+            pricelist = {},
+            mi, mpayload, testing;
+
+        // handle required fields
+        payload.name = this.$$("#nameField").value;
+        payload.brand = this.$$("#brandField").value;
+        payload.type = this.$$("#typeField").value;
+        
+        if (this.get("photos") && this.get("photos").length > 0)
+          payload.photos = this.get("photos");
+
+        // handle test results
+        if (this.$$("#testsToggle").checked) {
+          testing = this.$$("#productTesting");
+          payload.tests = {
+            thc: testing.thc,
+            cbd: testing.cbd,
+            terpenes: {
+              pinene: testing.pinene,
+              myrcene: testing.myrcene,
+              limonene: testing.limonene,
+              caryophyllene: testing.caryophyllene,
+              linalool: testing.linalool
+            }
+          };
+        }
+
+        payload.pricing = {
+          unit: {
+            available: priceAvailable,
+            value: priceValue
+          }
+        }
+
+        // handle optional fields
+        if (this.$$("#premiumToggle").checked) {
+          payload.flags = payload.flags || {};
+          payload.flags.premium = true;
+        }
+        if (this.$$("#showToggle").checked) {
+          payload.flags = payload.flags || {};
+          payload.flags.visible = true;
+        } else {
+          payload.flags = payload.flags || {};
+          payload.flags.visible = false;
+        }
+        if (this.$$("#bogoToggle").checked) {
+          payload.flags = payload.flags || {};
+          payload.flags.bogo = true;
+        }
+        if (this.$$("#saleToggle").checked) {
+          payload.flags = payload.flags || {};
+          payload.flags.sale = this.$$("#saleValue").value;
+        }
+        if (this.$$("#descriptionField").value !== undefined && this.$$("#descriptionField").value.length > 0)
+          payload.description = this.$$("#descriptionField").value;
+        return payload;
       }
     });
   </script>

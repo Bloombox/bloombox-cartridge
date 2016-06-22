@@ -65,6 +65,9 @@
             <!-- Buy-One-Get-One -->
             <iron-label class="bogo-label" hidden$="[[!bogo]]"><span>Buy One Get One</span></iron-label>
 
+            <!-- Species -->
+            <iron-label class="species-label" hidden$="[[!species]]"><span>[[species]]</span></iron-label>
+
             <!-- Test Results -->
             <bloombox-testing
               mode="basic"
@@ -113,7 +116,7 @@
                 <paper-item>Hybrid (No Dominance)</paper-item>
                 <paper-item>Sativa</paper-item>
               </paper-listbox>
-            </paper-dropdown-menu><!-- end paper-dropdown-menu#typeField -->
+            </paper-dropdown-menu><!-- end paper-dropdown-menu#speciesField -->
           </div><!-- end .row.basic-info -->
 
           <!-- Pricing/Sale Flags -->
@@ -211,7 +214,7 @@
         // handle required fields
         payload.name = this.get("name");
         payload.brand = this.get("brand");
-        payload.type = this.get("type");
+        payload.species = this.get("species");
         payload.photos = this.get("photos") || [];
         payload.pricing = this.get("pricing");
 
@@ -258,7 +261,7 @@
         // handle required fields
         payload.name = this.$$("#nameField").value;
         payload.brand = this.$$("#brandField").value;
-        payload.type = this.$$("#typeField").value;
+        payload.species = this.$$("#speciesField").value;
         
         if (this.get("photos") && this.get("photos").length > 0)
           payload.photos = this.get("photos");

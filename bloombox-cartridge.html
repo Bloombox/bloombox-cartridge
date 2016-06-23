@@ -102,7 +102,7 @@
     </template>
 
     <template is="dom-if" if="[[zerostate]]">
-      <paper-card header="Cartridge" class="product-card cartridge-product zerostate fullwidth">
+      <paper-card heading="Cartridge" class="product-card cartridge-product zerostate fullwidth">
         <div class="card-content">
           <div class="basic-info row">
             <!-- Name & Description -->
@@ -198,10 +198,15 @@
   </template>
 
   <script>
-    Polymer({
+    Polymer.BloomboxCartridge = Polymer({
       is: 'bloombox-cartridge',
-      schema: 'cartridge',
       behaviors: [Polymer.BloomboxUnitPricingProductCardBehavior],
+
+      /**
+       * Persistence schema and storage collection for this item.
+       */
+      _schema: 'cartridges',
+
       properties: {},
 
       /**

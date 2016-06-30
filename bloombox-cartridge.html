@@ -216,14 +216,28 @@
   <script>
     Polymer.BloomboxCartridge = Polymer({
       is: 'bloombox-cartridge',
-      behaviors: [Polymer.BloomboxBaseProductCardBehavior, Polymer.BloomboxUnitPricingProductCardBehavior],
+      behaviors: [Polymer.BloomboxBaseProductCardBehavior],
 
       /**
        * Persistence schema and storage collection for this item.
        */
       _schema: 'cartridges',
 
-      properties: {},
+      properties: {
+        /**
+         * Object specifying product pricing. This is specified in either weighted pricing (i.e.
+         * pricing per-gram or per-ounce), which is generally used for raw product, namely
+         * flowers and concentrates.
+         */
+        pricing: {
+          type: Object,
+          notify: true,
+          reflectToAttribute: true,
+          value: function() {
+            return {"unit": {"available": true, "value": 0}};
+          }
+        }
+      },
 
       /**
        * Read underlying object data, suitable for writing into underlying persistence

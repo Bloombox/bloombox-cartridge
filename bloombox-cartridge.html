@@ -216,7 +216,7 @@
   <script>
     Polymer.BloomboxCartridge = Polymer({
       is: 'bloombox-cartridge',
-      behaviors: [Polymer.BloomboxUnitPricingProductCardBehavior],
+      behaviors: [Polymer.BloomboxBaseProductCardBehavior, Polymer.BloomboxUnitPricingProductCardBehavior],
 
       /**
        * Persistence schema and storage collection for this item.

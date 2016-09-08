@@ -94,6 +94,7 @@
             <!-- Test Results -->
             <bloombox-testing
               mode="basic"
+              rating-mode="mg"
               thc="[[tests.thc]]"
               cbd="[[tests.cbd]]"></bloombox-testing>
           </div><!-- end div.row.stock-flags -->
@@ -107,7 +108,6 @@
           <div class="product-media cartridge-media row">
             <div class="bloombox-media-wrap">
               <bloombox-media
-                hidden$="[[_shouldHideImage()]]"
                 disabled
                 partner="[[partner]]"
                 environment="[[environment]]"
@@ -204,6 +204,7 @@
                   id="productTesting"
                   zerostate
                   mode="basic"
+                  rating-mode="mg"
                   thc="{{tests.thc}}"
                   cbd="{{tests.cbd}}"></bloombox-testing>
               </template>
@@ -236,7 +237,7 @@
         <!-- Actions -->
         <template is="dom-if" if="[[editing]]">
           <div class="zerostate-actions cartridge-zerostate-actions card-actions row">
-        <paper-icon-button
+            <paper-icon-button
               id="saveButton"
               icon="save"
               on-tap="commitEdits"></paper-icon-button>
@@ -249,7 +250,7 @@
             <paper-tooltip for="cancelButton" position="left">Cancel Edits</paper-tooltip>
           </div><!-- end .cartridge-zerostate-actions.card-actions -->
         </template>
-      </div><!-- end paper-card.product-card.zerostate.cartridge-product -->
+      </div><!-- end div.product-card.zerostate.cartridge-product -->
     </template>
   </template>
 
@@ -257,7 +258,8 @@
   function defaultTestConfig() {
       return {
         thc: 0.0,
-        cbd: 0.0
+        cbd: 0.0,
+        mode: 'mg'
       };
   }
 
@@ -304,7 +306,8 @@
       if (this.get("tests") !== undefined && this.get("tests") != null) {
         payload.tests = {
           thc: this.get("tests").thc,
-          cbd: this.get("tests").cbd
+          cbd: this.get("tests").cbd,
+          mode: this.get("tests").mode || 'mg'
         };
       }
 
@@ -353,7 +356,8 @@
         testing = this.$$("#productTesting");
         payload.tests = {
           thc: testing.thc,
-          cbd: testing.cbd
+          cbd: testing.cbd,
+          mode: testing.ratingMode || 'mg'
         };
       }
 

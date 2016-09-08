@@ -140,26 +140,27 @@
           <paper-icon-button id="markAsOutOfStockButton" on-tap="markAsOutOfStock" icon="block" hidden$="[[!visible]]"></paper-icon-button>
           <paper-tooltip for="markAsOutOfStockButton" position="left">Mark as Out-of-Stock</paper-tooltip>
         </div><!-- end div.card-actions -->
-      </div><!-- end paper-card.product-card.data-content.cartridge-product -->
+      </div><!-- end div.product-card.data-content.cartridge-product -->
     </template>
 
     <!-- - - - - - - - - - - -->
     <!-- Zero-State  Content -->
     <!-- - - - - - - - - - - -->
     <template is="dom-if" if="[[zerostate]]">
-      <paper-card heading="Cartridge" class="product-card cartridge-product zerostate fullwidth">
+      <div class="product-card cartridge-card zerostate">
         <div class="card-content">
           <div class="basic-info row">
             <!-- Name & Description -->
-            <paper-input id="brandField" placeholder="Brand Name" value="[[brand]]" required no-label-float name="brand" class="form-item cartridge-brand"></paper-input>
-            <paper-input id="nameField" placeholder="Product Name" value="[[name]]" required no-label-float name="name" class="form-item cartridge-name"></paper-input>
+            <paper-input id="brandField" placeholder="Brand Name" autofocus value="[[brand]]" required auto-validate error-message="Please provide a brand!" no-label-float name="brand" class="form-item cartridge-brand"></paper-input>
+            <paper-input id="nameField" value="[[name]]" required auto-validate error-message="Please provide a name!" label="Name" name="name" class="form-item cartridge-name"></paper-input>
             <paper-textarea id="descriptionField" label="Description" value="[[description]]" no-label-float name="description" class="form-item cartridge-description"></paper-textarea>
-            <paper-dropdown-menu id="speciesField" label="Species" class="form-item" noink no-label-float required name="species">
-              <paper-listbox class="dropdown-content" selected="{{species}}">
-                <paper-item>Indica</paper-item>
-                <paper-item>Hybrid (Indica Dominant)</paper-item>
-                <paper-item>Hybrid (No Dominance)</paper-item>
-                <paper-item>Sativa</paper-item>
+            <paper-dropdown-menu id="speciesField" label="Species" class="form-item" noink no-label-float required auto-validate name="species">
+              <paper-listbox class="dropdown-content" selected="{{species}}" attr-for-selected="key">
+                <paper-item key="Indica">Indica</paper-item>
+                <paper-item key="Hybrid (Indica Dominant)">Hybrid (Indica Dominant)</paper-item>
+                <paper-item key="Hybrid (No Dominance)">Hybrid (No Dominance)</paper-item>
+                <paper-item key="Sativa">Sativa</paper-item>
+                <paper-item key="Unspecified">Unspecified</paper-item>
               </paper-listbox>
             </paper-dropdown-menu><!-- end paper-dropdown-menu#speciesField -->
           </div><!-- end .row.basic-info -->

@@ -87,6 +87,9 @@
               <!-- Buy-One-Get-One -->
               <iron-label class="bogo-label" hidden$="[[!bogo]]"><span>Buy One Get One</span></iron-label>
 
+              <!-- Last Chance -->
+              <iron-label class="lastchance-label" hidden$="[[!lastchance]]"><span>Last Chance</span></iron-label>
+
               <!-- Species -->
               <iron-label class="species-label" hidden$="[[!species]]"><span>[[species]]</span></iron-label>
             </div>
@@ -190,6 +193,10 @@
             <div class="bogo-toggle-option">
               <paper-checkbox id="bogoToggle" checked="{{bogo}}" class="form-item item-bogo-toggle" noink>Buy One, Get One</paper-checkbox>
             </div><!-- end .bogo-toggle-option -->
+
+            <div class="lastchance-toggle-option">
+              <paper-checkbox id="lastchanceToggle" checked="{{lastchance}}" class="form-item item-lastchance-toggle" noink>Last Chance</paper-checkbox>
+            </div><!-- end .lastchance-toggle-option -->
           </div><!-- end .row.stock-flags -->
 
           <!-- Test Results -->
@@ -339,6 +346,13 @@
         payload.flags = payload.flags || {};
         payload.flags.bogo = false;
       }
+      if (this.get("lastchance") != null && this.get("lastchance") != undefined) {
+          payload.flags = payload.flags || {};
+          payload.flags.lastchance = this.get("lastchance");
+        } else {
+          payload.flags = payload.flags || {};
+          payload.flags.lastchance = false;
+        }
       if (this.get("description") !== undefined && this.get("description") !== null &&
           this.get("description").length > 0) {
         payload.description = this.get("description");
@@ -400,6 +414,13 @@
         payload.flags = payload.flags || {};
         payload.flags.bogo = false;
       }
+      if (this.$$("#lastchanceToggle").checked) {
+          payload.flags = payload.flags || {};
+          payload.flags.lastchance = true;
+        } else {
+          payload.flags = payload.flags || {};
+          payload.flags.lastchance = false;
+        }
       if (this.$$("#saleToggle").checked) {
         payload.flags = payload.flags || {};
         payload.flags.sale = this.$$("#saleValue").value;
